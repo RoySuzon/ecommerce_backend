@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Product Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+
+        <div class="mb-8 p-4 bg-white rounded-xl shadow-lg flex items-center space-x-4">
+            <label for="product-select" class="font-semibold text-gray-800">Select a Product:</label>
+            <select id="product-select"
+                class="p-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </select>
+        </div>
+
+        <nav class="mb-6 text-sm text-gray-500">
+            <a href="#" class="hover:underline">Home</a> >
+            <a href="#" class="hover:underline">Mobile Phone</a> >
+            <span id="product-brand-breadcrumb" class="text-gray-700"></span>
+        </nav>
+
+        <div id="loading-spinner" class="text-center py-10">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading product details...</p>
+        </div>
+
+        <div id="product-container" class="bg-white p-6 rounded-3xl shadow-lg mb-8 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="flex flex-col items-center">
+                    <div class="w-full flex justify-center mb-4">
+                        <img id="main-product-image" src="" alt="Product Main Image"
+                            class="w-full h-auto max-w-sm rounded-2xl shadow-md transition-transform duration-300 transform hover:scale-105">
+                    </div>
+                    <div id="thumbnail-gallery" class="flex space-x-2 overflow-x-auto w-full justify-center">
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 id="product-name" class="text-3xl font-bold text-gray-900"></h1>
+                            <p class="text-xl text-gray-700 mt-2">৳<span id="product-price"></span> <span
+                                    class="text-sm text-gray-400 line-through">৳<span id="regular-price"></span></span>
+                                <span id="discount-percent" class="text-sm text-red-500 font-medium"></span>
+                            </p>
+                        </div>
+                        <button
+                            class="flex items-center text-sm text-blue-500 font-medium hover:text-blue-700 transition-colors duration-200">
+                            <i class="fas fa-heart mr-1"></i> Add to Compare
+                        </button>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-gray-600 text-sm"><span class="font-semibold text-gray-800">Availability:</span>
+                            <span id="product-availability"></span>
+                        </p>
+                        <p class="text-gray-600 text-sm"><span class="font-semibold text-gray-800">Code:</span> <span
+                                id="product-code"></span></p>
+                    </div>
+
+                    <div id="color-selection" class="mb-4">
+                        <p class="font-semibold text-gray-800 mb-2">Color:</p>
+                        <div id="color-buttons" class="flex flex-wrap gap-2">
+                        </div>
+                    </div>
+
+                    <div id="storage-selection" class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">Storage:</p>
+                        <div id="storage-buttons" class="flex flex-wrap gap-2">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center mb-6">
+                        <p class="font-semibold text-gray-800 mr-4">Select Quantity:</p>
+                        <div class="flex items-center border border-gray-300 rounded-full overflow-hidden">
+                            <button id="quantity-minus"
+                                class="p-2 w-10 text-xl text-gray-600 hover:bg-gray-200 transition-colors duration-200">-</button>
+                            <input id="quantity-input" type="text" value="1"
+                                class="w-12 text-center border-x border-gray-300 outline-none text-gray-800 text-base">
+                            <button id="quantity-plus"
+                                class="p-2 w-10 text-xl text-gray-600 hover:bg-gray-200 transition-colors duration-200">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-4 mb-6">
+                        <button
+                            class="w-full sm:w-auto flex-1 bg-orange-500 text-white font-semibold py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-200 shadow-md">
+                            Shop Now
+                        </button>
+                        <button
+                            class="w-full sm:w-auto flex-1 bg-blue-500 text-white font-semibold py-3 px-6 rounded-full text-lg hover:bg-blue-600 transition-colors duration-200 shadow-md flex items-center justify-center">
+                            <i class="fas fa-shopping-cart mr-2"></i> Add To Cart
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center text-sm text-gray-600">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-sack-dollar text-orange-500"></i>
+                            <span>EMI Available <a href="#" class="text-blue-500 font-medium hover:underline">View
+                                    Plans</a></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fab fa-whatsapp text-green-500"></i>
+                            <span>Whatsapp</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-sm text-gray-600">
+                        <p><i class="fas fa-truck mr-2 text-blue-500"></i><span class="font-semibold">Delivery
+                                Timescale:</span> <span id="delivery-timescale"></span></p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="tabs-section" class="bg-white p-6 rounded-3xl shadow-lg mb-8 hidden">
+            <div class="flex border-b border-gray-200 mb-4">
+                <button id="spec-tab"
+                    class="py-2 px-6 border-b-2 border-blue-500 text-blue-500 font-semibold focus:outline-none">Specification</button>
+                <button id="desc-tab"
+                    class="py-2 px-6 text-gray-600 font-semibold focus:outline-none hover:text-blue-500 transition-colors duration-200">Description</button>
+                <button id="warranty-tab"
+                    class="py-2 px-6 text-gray-600 font-semibold focus:outline-none hover:text-blue-500 transition-colors duration-200">Warranty</button>
+            </div>
+
+            <div id="spec-content" class="tab-content">
+                <table class="min-w-full table-auto text-sm text-gray-700">
+                    <tbody id="spec-table-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="desc-content" class="tab-content hidden">
+                <p id="product-description" class="p-4 text-gray-700 leading-relaxed"></p>
+            </div>
+
+            <div id="warranty-content" class="tab-content hidden">
+                <p class="p-4 text-gray-700 leading-relaxed">
+                    This product comes with a 1-year manufacturer's warranty against defects. Please retain your proof
+                    of purchase for any warranty claims. For more details, refer to the warranty card included in the
+                    box.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productSelect = document.getElementById('product-select');
+            const productContainer = document.getElementById('product-container');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const tabsSection = document.getElementById('tabs-section');
+            const mainImage = document.getElementById('main-product-image');
+            const thumbnailGallery = document.getElementById('thumbnail-gallery');
+            const colorButtonsContainer = document.getElementById('color-buttons');
+            const storageButtonsContainer = document.getElementById('storage-buttons');
+            const quantityInput = document.getElementById('quantity-input');
+            const quantityMinus = document.getElementById('quantity-minus');
+            const quantityPlus = document.getElementById('quantity-plus');
+            const productPriceSpan = document.getElementById('product-price');
+            const regularPriceSpan = document.getElementById('regular-price');
+            const discountPercentSpan = document.getElementById('discount-percent');
+            const specTab = document.getElementById('spec-tab');
+            const descTab = document.getElementById('desc-tab');
+            const warrantyTab = document.getElementById('warranty-tab');
+            const specContent = document.getElementById('spec-content');
+            const descContent = document.getElementById('desc-content');
+            const warrantyContent = document.getElementById('warranty-content');
+            const specTableBody = document.getElementById('spec-table-body');
+
+            let allProducts = [];
+            let currentProduct = null;
+            let selectedColor = null;
+            let selectedStorage = null;
+
+            const API_URL = 'http://localhost:3000/product';
+
+            // Function to populate the UI with data for a specific product
+            function populateUI(product) {
+                if (!product || !product.variants || product.variants.length === 0) {
+                    console.error('Invalid product data or no variants:', product);
+                    return;
+                }
+
+                currentProduct = product;
+
+                // Update basic product info
+                document.getElementById('product-brand-breadcrumb').textContent = product.brand.name;
+                document.getElementById('product-name').textContent = product.name;
+                document.getElementById('product-availability').textContent = product.availability.status;
+                document.getElementById('product-code').textContent = product.productCode;
+                document.getElementById('delivery-timescale').textContent = product.deliveryTimescale;
+                document.getElementById('product-description').textContent = product.description;
+
+                // Populate specifications table
+                const specs = product.specifications;
+                if (specs) {
+                    specTableBody.innerHTML = ''; // Clear existing
+                    for (const [key, value] of Object.entries(specs)) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="p-3 font-semibold capitalize">${key}</td>
+                            <td class="p-3">${value}</td>
+                        `;
+                        specTableBody.appendChild(row);
+                    }
+                }
+
+                // Populate color and storage buttons
+                populateVariantButtons(product.variants);
+
+                // Initialize with the first variant
+                const firstVariant = product.variants[0];
+                selectedColor = firstVariant.color;
+                selectedStorage = firstVariant.storage;
+                updateProductDetails(firstVariant);
+                updateButtonSelection(colorButtonsContainer, selectedColor);
+                updateButtonSelection(storageButtonsContainer, selectedStorage);
+
+                productContainer.classList.remove('hidden');
+                tabsSection.classList.remove('hidden');
+            }
+
+            function populateVariantButtons(variants) {
+                const uniqueColors = [...new Set(variants.map(v => v.color))];
+                const uniqueStorage = [...new Set(variants.map(v => v.storage))];
+
+                // Clear existing buttons
+                colorButtonsContainer.innerHTML = '';
+                storageButtonsContainer.innerHTML = '';
+
+                uniqueColors.forEach(color => {
+                    const button = document.createElement('button');
+                    button.dataset.color = color;
+                    button.textContent = color;
+                    button.className = 'color-btn border-2 border-gray-300 text-gray-800 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition-colors duration-200';
+                    colorButtonsContainer.appendChild(button);
+                    button.addEventListener('click', () => handleVariantChange(color, null));
+                });
+
+                uniqueStorage.forEach(storage => {
+                    const button = document.createElement('button');
+                    button.dataset.storage = storage;
+                    button.textContent = storage;
+                    button.className = 'storage-btn border-2 border-gray-300 text-gray-800 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition-colors duration-200';
+                    storageButtonsContainer.appendChild(button);
+                    button.addEventListener('click', () => handleVariantChange(null, storage));
+                });
+            }
+
+            function updateProductDetails(variant) {
+                if (!variant) return;
+
+                // Update image gallery
+                mainImage.src = variant.images[0] || 'https://placehold.co/400x400';
+                thumbnailGallery.innerHTML = ''; // Clear existing thumbnails
+                variant.images.forEach((imgSrc, index) => {
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = `Product thumbnail ${index + 1}`;
+                    img.className = 'w-20 h-20 rounded-lg cursor-pointer border-2 border-gray-300 hover:border-blue-500 transition-all duration-200 thumbnail';
+                    img.addEventListener('click', () => mainImage.src = imgSrc);
+                    thumbnailGallery.appendChild(img);
+                });
+
+                // Update prices
+                productPriceSpan.textContent = variant.salePrice.toLocaleString();
+                regularPriceSpan.textContent = variant.regularPrice.toLocaleString();
+                const discount = ((variant.regularPrice - variant.salePrice) / variant.regularPrice * 100).toFixed(0);
+                discountPercentSpan.textContent = `${discount}% OFF`;
+            }
+
+            function handleVariantChange(newColor, newStorage) {
+                if (!currentProduct) return;
+
+                if (newColor) selectedColor = newColor;
+                if (newStorage) selectedStorage = newStorage;
+
+                if (selectedColor && selectedStorage) {
+                    const foundVariant = currentProduct.variants.find(
+                        v => v.color === selectedColor && v.storage === selectedStorage
+                    );
+
+                    if (foundVariant) {
+                        updateProductDetails(foundVariant);
+                        updateButtonSelection(colorButtonsContainer, selectedColor);
+                        updateButtonSelection(storageButtonsContainer, selectedStorage);
+                    } else {
+                        // This combination doesn't exist. Find the first available variant for the new selection.
+                        const fallbackVariant = newColor
+                            ? currentProduct.variants.find(v => v.color === newColor)
+                            : currentProduct.variants.find(v => v.storage === newStorage);
+
+                        if (fallbackVariant) {
+                            selectedColor = fallbackVariant.color;
+                            selectedStorage = fallbackVariant.storage;
+                            updateProductDetails(fallbackVariant);
+                            updateButtonSelection(colorButtonsContainer, selectedColor);
+                            updateButtonSelection(storageButtonsContainer, selectedStorage);
+                        }
+                    }
+                }
+            }
+
+            function updateButtonSelection(container, selectedValue) {
+                container.querySelectorAll('button').forEach(button => {
+                    button.classList.remove('border-blue-500', 'ring-2', 'ring-blue-200');
+                    button.classList.add('border-gray-300');
+                    if (button.textContent === selectedValue) {
+                        button.classList.add('border-blue-500', 'ring-2', 'ring-blue-200');
+                        button.classList.remove('border-gray-300');
+                    }
+                });
+            }
+
+            // Quantity buttons logic
+            quantityMinus.addEventListener('click', () => {
+                let quantity = parseInt(quantityInput.value);
+                if (quantity > 1) {
+                    quantityInput.value = quantity - 1;
+                }
+            });
+
+            quantityPlus.addEventListener('click', () => {
+                let quantity = parseInt(quantityInput.value);
+                quantityInput.value = quantity + 1;
+            });
+
+            // Tab functionality
+            const tabs = [specTab, descTab, warrantyTab];
+            const contents = [specContent, descContent, warrantyContent];
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.classList.remove('border-blue-500', 'text-blue-500');
+                        t.classList.add('text-gray-600');
+                        t.style.borderColor = 'transparent'; // Reset border for inactive tabs
+                    });
+                    tab.classList.remove('text-gray-600');
+                    tab.classList.add('border-blue-500', 'text-blue-500');
+
+                    contents.forEach(content => content.classList.add('hidden'));
+                    if (tab.id === 'spec-tab') specContent.classList.remove('hidden');
+                    if (tab.id === 'desc-tab') descContent.classList.remove('hidden');
+                    if (tab.id === 'warranty-tab') warrantyContent.classList.remove('hidden');
+                });
+            });
+
+            // Fetch data from API and initialize the page
+            async function fetchAndInitialize() {
+                loadingSpinner.classList.remove('hidden');
+                productContainer.classList.add('hidden');
+                tabsSection.classList.add('hidden');
+
+                try {
+                    const response = await fetch(API_URL);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    allProducts = await response.json();
+
+                    // Populate the dropdown with product names
+                    productSelect.innerHTML = '';
+                    allProducts.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = product.name;
+                        productSelect.appendChild(option);
+                    });
+
+                    // Handle dropdown change
+                    productSelect.addEventListener('change', (event) => {
+                        const selectedProductId = event.target.value;
+                        const product = allProducts.find(p => p.id === selectedProductId);
+                        if (product) {
+                            populateUI(product);
+                        }
+                    });
+
+                    // Populate the page with the first product by default
+                    if (allProducts.length > 0) {
+                        populateUI(allProducts[0]);
+                    }
+
+                } catch (error) {
+                    console.error('Failed to fetch products:', error);
+                    loadingSpinner.innerHTML = `<p class="text-red-500 font-semibold">Failed to load product data. Please check the API or try again later.</p>`;
+                } finally {
+                    if (allProducts.length > 0) {
+                        loadingSpinner.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Initial call to start the process
+            fetchAndInitialize();
+        });
+    </script>
+</body>
+
+</html>

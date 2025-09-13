@@ -1,5 +1,4 @@
 
-import { Product } from "../../../generated/prisma";
 import prisma from "../../prisma";
 
 class ProductService {
@@ -7,17 +6,23 @@ class ProductService {
     async fetchProduct() {
         return await prisma.product.findMany({
             include: {
-                catagory: true
+                category: true,
+                availability: true,
+                variants: true,
+                brand: true,
+                region: true,
+                simType: true,
+                type: true
             }
         })
     }
 
 
-    async createProduct(product: Product): Promise<Product> {
-        return await prisma.product.create({
-            data: product
-        })
-    }
+    // async createProduct(product: Product): Promise<Product> {
+    //     return await prisma.product.create({
+    //         data: product
+    //     })
+    // }
 }
 
 

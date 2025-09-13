@@ -14,76 +14,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
-  userInfo  userInfo?
-  Order     Order[]
-
-  @@map("users")
-}
-
-model userInfo {
-  id        String   @id @default(cuid())
-  address   String
-  phone     String
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  @@map("user_infos")
-}
-
-model Catagory {
-  id        String    @id @default(cuid())
-  name      String
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
-
-  @@map("catagories")
-}
-
+// Represents the main product listing, e.g., "Motorola Edge 60 Fusion 5G"
 model Product {
-  id          String      @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  catagoryId  String
-  catagory    Catagory    @relation(fields: [catagoryId], references: [id], onDelete: Cascade)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now()) @updatedAt
-  OrderItem   OrderItem[]
+  id                String  @id @default(cuid())
+  name              String
+  brandId           String
+  model             String
+  description       String? // Optional field for the product description
+  productCode       String  @unique
+  availabilityId    String
+  deliveryTimescale String
+  specifications    Json? // Stores key-value pairs for specs like "Network", "Dimensions"
+  typeId            String
+  simTypeId         String
+  regionId          String
+  categoryId        String
 
-  @@map("products")
+  brand        Brand            @relation(fields: [brandId], references: [id])
+  type         ProductType      @relation(fields: [typeId], references: [id])
+  region       Region           @relation(fields: [regionId], references: [id])
+  availability Availability     @relation(fields: [availabilityId], references: [id])
+  simType      SimType          @relation(fields: [simTypeId], references: [id])
+  category     Category         @relation(fields: [categoryId], references: [id])
+  variants     ProductVariant[]
 }
 
-model Order {
-  id         String      @id @default(cuid())
-  userId     String
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  totalPrice Float
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @default(now()) @updatedAt
-  orderItems OrderItem[]
+// Represents the different versions of a product, like color and storage options
+model ProductVariant {
+  id           String   @id @default(cuid())
+  color        String
+  storage      String
+  images       String[] // An array of URLs for images of this specific variant
+  regularPrice Float
+  salePrice    Float? // Optional, for discounted products
 
-  @@map("orders")
-}
-
-model OrderItem {
-  id        String   @id @default(cuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  // A foreign key linking this variant to a product
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  quantity  Int
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  product   Product @relation(fields: [productId], references: [id])
+}
 
-  @@map("order_items")
+// New model for product brand
+model Brand {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
+}
+
+// New model for product type
+model ProductType {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
+}
+
+// New model for product region
+model Region {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
+}
+
+// New model for availability status
+model Availability {
+  id       String    @id @default(cuid())
+  status   String    @unique
+  products Product[]
+}
+
+// New model for SIM type
+model SimType {
+  id       String    @id @default(cuid())
+  type     String    @unique
+  products Product[]
+}
+
+// New model for product category
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
 }
