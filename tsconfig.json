@@ -1,12 +1,14 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    "target": "ES2021",
+    "target": "ES2020",
     "module": "CommonJS",
     // "outDir": "./dist",
     // "rootDir": "./src",
-    "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true, // <--- অবশ্যই থাকুক
+    "allowSyntheticDefaultImports": true
   }
 }

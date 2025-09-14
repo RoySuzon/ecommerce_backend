@@ -1,0 +1,102 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "My TS API",
+    "description": "API Documentation",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/product/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "deliveryTimescale",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "specification",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "brandId",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "typeId",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "regionId",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "availabilityId",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "simTypeId",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "minRegularPrice",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "maxRegularPrice",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}
