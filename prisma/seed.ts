@@ -1,155 +1,175 @@
 import prisma from "../src/prisma";
 
+
 async function main() {
-    console.log('Start seeding...');
+    console.log('🌱 Seeding database with integer IDs...');
 
-    // 1. Clear existing data to avoid conflicts
-    await prisma.productVariant.deleteMany({});
-    await prisma.product.deleteMany({});
-    await prisma.category.deleteMany({});
-    await prisma.brand.deleteMany({});
-    await prisma.productType.deleteMany({});
-    await prisma.region.deleteMany({});
-    await prisma.availability.deleteMany({});
-    await prisma.simType.deleteMany({});
-
-    // 2. Create foundational data first (tables with no foreign keys)
-    const mobilePhoneCategory = await prisma.category.create({
-        data: { name: 'Mobile Phone' },
-    });
-
-    const motorolaBrand = await prisma.brand.create({
-        data: { name: 'Motorola' },
-    });
-
-    const appleBrand = await prisma.brand.create({
-        data: { name: 'Apple' },
-    });
-
-    const exynosType = await prisma.productType.create({
-        data: { name: 'Exynos 5G' },
-    });
-
-    const snapdragonType = await prisma.productType.create({
-        data: { name: 'Snapdragon 5G' },
-    });
-
-    const officialRegion = await prisma.region.create({
-        data: { name: 'BD-Official' },
-    });
-
-    const inStockAvailability = await prisma.availability.create({
-        data: { status: 'In Stock' },
-    });
-
-    const dualSim = await prisma.simType.create({
-        data: { type: 'Dual' },
-    });
-
-    const singleSim = await prisma.simType.create({
-        data: { type: 'Single' },
-    });
-
-    // 3. Create products and link them to the foundational data
-    const motorolaProduct = await prisma.product.create({
+    // --- Brand ---
+    const apple = await prisma.brand.create({
         data: {
-            name: 'Motorola Edge 60 Fusion 5G',
-            model: 'Edge 60 Fusion 5G',
-            productCode: 'AGL29317',
-            description: '161 x 73 x 8.0 mm | IP68/IP69 dust/water resistant (high-pressure water jets; immersible up to 1.5m for 30 min) | Corning Gorilla Glass 7i | Glass front (Gorilla Glass 7i), silicone polymer back (eco leather)',
-            deliveryTimescale: '3-5 Days',
-            specifications: {
-                network: 'GSM / HSPA / LTE / 5G',
-                dimensions: '161 x 73 x 8.0 mm',
-                display: '6.7 inches, 1B colors, 120Hz',
-                os: 'Android 14',
-            },
-            brandId: motorolaBrand.id,
-            categoryId: mobilePhoneCategory.id,
-            typeId: snapdragonType.id,
-            regionId: officialRegion.id,
-            availabilityId: inStockAvailability.id,
-            simTypeId: dualSim.id,
-        },
+            name: "Apple",
+            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+        }
     });
 
-    const iphone15Product = await prisma.product.create({
+    const samsung = await prisma.brand.create({
         data: {
-            name: 'iPhone 16 Pro Max',
-            model: '16 Pro Max',
-            productCode: 'IPH-16-PRO-MAX',
-            description: 'Experience the ultimate in mobile technology with the iPhone 16 Pro Max.',
-            deliveryTimescale: '3-5 Days',
-            specifications: {
-                network: 'GSM / CDMA / HSPA / EVDO / LTE / 5G',
-                dimensions: '160.7 x 77.6 x 7.9 mm',
-                display: '6.7 inches, 120Hz ProMotion',
-                os: 'iOS 18',
-            },
-            brandId: appleBrand.id,
-            categoryId: mobilePhoneCategory.id,
-            typeId: exynosType.id,
-            regionId: officialRegion.id,
-            availabilityId: inStockAvailability.id,
-            simTypeId: singleSim.id,
-        },
+            name: "Samsung",
+            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg"
+        }
     });
 
-    // 4. Create variants for each product
+    // --- Category ---
+    const mobile = await prisma.category.create({
+        data: { name: "Mobile" }
+    });
+
+    const laptop = await prisma.category.create({
+        data: { name: "Laptop" }
+    });
+
+    // --- Availability ---
+    const inStock = await prisma.availability.create({
+        data: { status: "In Stock" }
+    });
+
+    const preOrder = await prisma.availability.create({
+        data: { status: "Pre-order" }
+    });
+
+    // --- Product: iPhone 15 Pro Max ---
+    const iphone15ProMax = await prisma.product.create({
+        data: {
+            name: "iPhone 15 Pro Max",
+            model: "Pro Max",
+            productCode: "IP15PM-001",
+            description: "The latest iPhone 15 Pro Max with A17 Bionic chip and Titanium body.",
+            deliveryTimescale: "2-3 Days",
+            specifications: {
+                Display: "6.7-inch OLED",
+                Battery: "4500mAh",
+                Processor: "A17 Pro",
+            },
+            brandId: apple.id,
+            categoryId: mobile.id,
+            availabilityId: inStock.id,
+        }
+    });
+
+    // --- Variants for iPhone 15 Pro Max ---
     await prisma.productVariant.createMany({
         data: [
             {
-                color: 'Amazonite',
-                storage: '8/256GB',
-                regularPrice: 32200,
-                salePrice: 28980,
-                images: ['https://placehold.co/400x400', 'https://placehold.co/400x400'],
-                productId: motorolaProduct.id,
+                productId: iphone15ProMax.id,
+                color: "Blue",
+                storage: "256GB",
+                ram: "8GB",
+                regularPrice: 170000,
+                discountPrice: 160000,
+                stockQty: 10,
+                images: [
+                    "https://example.com/iphone15-blue-front.jpg",
+                    "https://example.com/iphone15-blue-back.jpg"
+                ]
             },
             {
-                color: 'Mykonos Blue',
-                storage: '12/256GB',
-                regularPrice: 38000,
-                salePrice: 32300,
-                images: ['https://placehold.co/400x400', 'https://placehold.co/400x400'],
-                productId: motorolaProduct.id,
-            },
-            {
-                color: 'Slipstream',
-                storage: '12/512GB',
-                regularPrice: 40000,
-                salePrice: 34000,
-                images: ['https://placehold.co/400x400', 'https://placehold.co/400x400'],
-                productId: motorolaProduct.id,
-            },
-            {
-                color: 'Zephyr',
-                storage: '12/512GB',
-                regularPrice: 42000,
-                salePrice: 35700,
-                images: ['https://placehold.co/400x400', 'https://placehold.co/400x400'],
-                productId: motorolaProduct.id,
-            },
-            {
-                color: 'Titanium Black',
-                storage: '12/256GB',
-                regularPrice: 152000,
-                salePrice: 144400,
-                images: ['https://placehold.co/400x400', 'https://placehold.co/400x400'],
-                productId: iphone15Product.id,
-            },
-            {
-                color: 'Titanium Blue',
-                storage: '12/512GB',
-                regularPrice: 165000,
-                salePrice: 156750,
-                images: ['https://placehold.co/400x400', 'https://placehold.co/400x400'],
-                productId: iphone15Product.id,
-            },
-        ],
+                productId: iphone15ProMax.id,
+                color: "Black",
+                storage: "512GB",
+                ram: "8GB",
+                regularPrice: 190000,
+                discountPrice: 180000,
+                stockQty: 5,
+                images: [
+                    "https://example.com/iphone15-black-front.jpg",
+                    "https://example.com/iphone15-black-back.jpg"
+                ]
+            }
+        ]
     });
 
-    console.log('Seeding finished.');
+    // --- Specification Table (extra structured specs) ---
+    await prisma.specification.createMany({
+        data: [
+            {
+                productId: iphone15ProMax.id,
+                key: "Camera",
+                value: "48MP + 12MP Ultra Wide"
+            },
+            {
+                productId: iphone15ProMax.id,
+                key: "OS",
+                value: "iOS 17"
+            }
+        ]
+    });
+
+    // --- Another Product: Samsung Galaxy S24 Ultra ---
+    const galaxyS24Ultra = await prisma.product.create({
+        data: {
+            name: "Samsung Galaxy S24 Ultra",
+            model: "Ultra",
+            productCode: "SGS24U-001",
+            description: "Samsung’s flagship Galaxy S24 Ultra with Snapdragon 8 Gen 3.",
+            deliveryTimescale: "3-5 Days",
+            specifications: {
+                Display: "6.8-inch AMOLED",
+                Battery: "5000mAh",
+                Processor: "Snapdragon 8 Gen 3",
+            },
+            brandId: samsung.id,
+            categoryId: mobile.id,
+            availabilityId: preOrder.id,
+        }
+    });
+
+    await prisma.productVariant.createMany({
+        data: [
+            {
+                productId: galaxyS24Ultra.id,
+                color: "Gray",
+                storage: "256GB",
+                ram: "12GB",
+                regularPrice: 180000,
+                discountPrice: 170000,
+                stockQty: 15,
+                images: [
+                    "https://example.com/galaxyS24-gray-front.jpg",
+                    "https://example.com/galaxyS24-gray-back.jpg"
+                ]
+            },
+            {
+                productId: galaxyS24Ultra.id,
+                color: "White",
+                storage: "512GB",
+                ram: "12GB",
+                regularPrice: 200000,
+                discountPrice: 190000,
+                stockQty: 7,
+                images: [
+                    "https://example.com/galaxyS24-white-front.jpg",
+                    "https://example.com/galaxyS24-white-back.jpg"
+                ]
+            }
+        ]
+    });
+
+    await prisma.specification.createMany({
+        data: [
+            {
+                productId: galaxyS24Ultra.id,
+                key: "Camera",
+                value: "200MP + 12MP Ultra Wide + 10MP Telephoto"
+            },
+            {
+                productId: galaxyS24Ultra.id,
+                key: "OS",
+                value: "Android 14 (One UI 6)"
+            }
+        ]
+    });
+
+    console.log("✅ Database seeded successfully with demo products!");
 }
 
 main()

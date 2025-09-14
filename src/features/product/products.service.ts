@@ -8,29 +8,31 @@ class ProductService {
     async fetchProduct(filter: Prisma.ProductWhereInput) {
         return await prisma.product.findMany({
             where: filter,
-            include: { variants: true, brand: true, type: true, region: true, availability: true, simType: true, category: true },
+            include: {
+                category: true,
+                availability: true,
+                brand: true,
+                variants: true
+
+            }
+            // include: { videos: true, brand: true, type: true, region: true, availability: true, simType: true, category: true },
         })
+    }
+    async fetchVariant(id: number) {
+        return await prisma.productVariant.findUnique({
+            where: {
+                id: id
+            }
+        })
+
     }
 
 
-    // async createProduct(product: Product): Promise<Product> {
-    //     return await prisma.product.create({
-    //         data: product
-    //     })
-    // }
-}
-
-
-export interface ProductSearchFilters {
-    name?: string;           // Filter by category
-    model?: string;           // Filter by category
-    categoryId?: string;           // Filter by category
-    brandId?: string;              // Filter by brand
-    minPrice?: number;             // Minimum price filter
-    maxPrice?: number;             // Maximum price filter
-    inStock?: boolean;             // Availability filter
-    rating?: number;               // Minimum rating filter (1-5)
-    tags?: string[];               // Tags or keywords filter
+    async createProduct(product: Prisma.ProductCreateInput) {
+        return await prisma.product.create({
+            data: product
+        })
+    }
 }
 
 

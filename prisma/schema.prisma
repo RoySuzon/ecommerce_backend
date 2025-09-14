@@ -14,83 +14,90 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Represents the main product listing, e.g., "Motorola Edge 60 Fusion 5G"
-model Product {
-  id                String  @id @default(cuid())
-  name              String
-  brandId           String
-  model             String
-  description       String? // Optional field for the product description
-  productCode       String  @unique
-  availabilityId    String
-  deliveryTimescale String
-  specifications    Json? // Stores key-value pairs for specs like "Network", "Dimensions"
-  typeId            String
-  simTypeId         String
-  regionId          String
-  categoryId        String
-
-  brand        Brand            @relation(fields: [brandId], references: [id])
-  type         ProductType      @relation(fields: [typeId], references: [id])
-  region       Region           @relation(fields: [regionId], references: [id])
-  availability Availability     @relation(fields: [availabilityId], references: [id])
-  simType      SimType          @relation(fields: [simTypeId], references: [id])
-  category     Category         @relation(fields: [categoryId], references: [id])
-  variants     ProductVariant[]
-}
-
-// Represents the different versions of a product, like color and storage options
-model ProductVariant {
-  id           String   @id @default(cuid())
-  color        String
-  storage      String
-  images       String[] // An array of URLs for images of this specific variant
-  regularPrice Float
-  salePrice    Float? // Optional, for discounted products
-
-  // A foreign key linking this variant to a product
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-}
-
-// New model for product brand
+/// ✅ Brand Table
 model Brand {
-  id       String    @id @default(cuid())
-  name     String    @unique
+  id       Int       @id @default(autoincrement())
+  name     String
+  logoUrl  String?
   products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-// New model for product type
-model ProductType {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  products Product[]
-}
-
-// New model for product region
-model Region {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  products Product[]
-}
-
-// New model for availability status
-model Availability {
-  id       String    @id @default(cuid())
-  status   String    @unique
-  products Product[]
-}
-
-// New model for SIM type
-model SimType {
-  id       String    @id @default(cuid())
-  type     String    @unique
-  products Product[]
-}
-
-// New model for product category
+/// ✅ Category Table
 model Category {
-  id       String    @id @default(cuid())
-  name     String    @unique
+  id       Int       @id @default(autoincrement())
+  name     String
   products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// ✅ Availability Table
+model Availability {
+  id       Int       @id @default(autoincrement())
+  status   String
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// ✅ Product Table
+model Product {
+  id                Int     @id @default(autoincrement())
+  name              String
+  model             String?
+  productCode       String  @unique
+  description       String?
+  deliveryTimescale String?
+  specifications    Json?
+
+  brandId Int
+  brand   Brand @relation(fields: [brandId], references: [id])
+
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  availabilityId Int
+  availability   Availability @relation(fields: [availabilityId], references: [id])
+
+  variants          ProductVariant[]
+  specificationsRel Specification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// ✅ ProductVariant Table
+model ProductVariant {
+  id            Int      @id @default(autoincrement())
+  color         String?
+  storage       String?
+  ram           String?
+  regularPrice  Float
+  discountPrice Float?
+  stockQty      Int      @default(0)
+  images        String[]
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// ✅ Specification Table
+model Specification {
+  id    Int    @id @default(autoincrement())
+  key   String
+  value String
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
