@@ -67,9 +67,6 @@
                 "model": {
                   "example": "any"
                 },
-                "productCode": {
-                  "example": "any"
-                },
                 "description": {
                   "example": "any"
                 },
@@ -657,6 +654,9 @@
                 },
                 "productId": {
                   "example": "any"
+                },
+                "productCode": {
+                  "example": "any"
                 }
               }
             }
@@ -732,6 +732,23 @@
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/common/dropdown": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string"
           }
         ],
         "responses": {

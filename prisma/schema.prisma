@@ -50,7 +50,6 @@ model Product {
   id                Int     @id @default(autoincrement())
   name              String
   model             String?
-  productCode       String  @unique
   description       String?
   deliveryTimescale String?
   specifications    Json?
@@ -77,6 +76,7 @@ model ProductVariant {
   color         String?
   storage       String?
   ram           String?
+  productCode   String   @unique
   regularPrice  Float
   discountPrice Float?
   stockQty      Int      @default(0)

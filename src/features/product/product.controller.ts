@@ -25,16 +25,15 @@ class ProductController {
     // Add single product
     async addProduct(req: Request, res: Response) {
         try {
-            const { name, model, productCode, description, deliveryTimescale, specifications, brandId, categoryId, availabilityId } = req.body;
+            const { name, model, description, deliveryTimescale, specifications, brandId, categoryId, availabilityId } = req.body;
 
-            if (!name || !productCode || !brandId || !categoryId || !availabilityId) {
+            if (!name || !brandId || !categoryId || !availabilityId) {
                 return res.error({ message: "Missing required fields", statusCode: 400 });
             }
 
             const data = await productsService.insertProduct({
                 name,
                 model,
-                productCode,
                 description,
                 deliveryTimescale,
                 specifications,

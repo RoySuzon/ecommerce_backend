@@ -4,9 +4,9 @@ import { NextFunction, Request, Response } from "express";
 export interface ApiResponse<T = any> {
     success: boolean;
     message?: string;
+    statusCode: number;
     data?: T;
     errors?: string[];
-    statusCode: number;
     timestamp: string;
 }
 
@@ -28,8 +28,8 @@ export function responseMiddleware(req: Request, res: Response, next: NextFuncti
         const response: ApiResponse<T> = {
             success: true,
             message,
-            data,
             statusCode,
+            data,
             timestamp: new Date().toISOString(),
         };
         return res.status(statusCode).json(response);

@@ -6,6 +6,7 @@ import swaggerFile from '../swagger-output.json';
 import availabilityRoute from "./features/availability/availability.route";
 import brandRoute from "./features/brand/brand.route";
 import categoryRoute from "./features/category/category.route";
+import commonRoute from "./features/common/common.route";
 import productRoute from "./features/product/product.route";
 import specificationRoute from "./features/specification/specification.route";
 import productVariantRoute from "./features/variant/productVariant.route";
@@ -25,6 +26,7 @@ app.use('/brand', brandRoute)
 app.use('/availability', availabilityRoute)
 app.use('/specification', specificationRoute)
 app.use('/variant', productVariantRoute)
+app.use('/common', commonRoute)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 

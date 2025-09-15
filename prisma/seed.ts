@@ -8,14 +8,14 @@ async function main() {
     const apple = await prisma.brand.create({
         data: {
             name: "Apple",
-            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/960px-Samsung_Logo.svg.png"
         }
     });
 
     const samsung = await prisma.brand.create({
         data: {
             name: "Samsung",
-            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg"
+            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/120px-Apple_logo_black.svg.png"
         }
     });
 
@@ -42,7 +42,6 @@ async function main() {
         data: {
             name: "iPhone 15 Pro Max",
             model: "Pro Max",
-            productCode: "IP15PM-001",
             description: "The latest iPhone 15 Pro Max with A17 Bionic chip and Titanium body.",
             deliveryTimescale: "2-3 Days",
             specifications: {
@@ -61,6 +60,7 @@ async function main() {
         data: [
             {
                 productId: iphone15ProMax.id,
+                productCode: "IPHONE-16-PRO-MAX-BLUE-01",
                 color: "Blue",
                 storage: "256GB",
                 ram: "8GB",
@@ -74,6 +74,7 @@ async function main() {
             },
             {
                 productId: iphone15ProMax.id,
+                productCode: 'IPHONE-16-PRO-MAX-BLACK-01',
                 color: "Black",
                 storage: "512GB",
                 ram: "8GB",
@@ -109,7 +110,6 @@ async function main() {
         data: {
             name: "Samsung Galaxy S24 Ultra",
             model: "Ultra",
-            productCode: "SGS24U-001",
             description: "Samsung’s flagship Galaxy S24 Ultra with Snapdragon 8 Gen 3.",
             deliveryTimescale: "3-5 Days",
             specifications: {
@@ -127,6 +127,7 @@ async function main() {
         data: [
             {
                 productId: galaxyS24Ultra.id,
+                productCode: 'SAMSUNG-S24-ULTRA-GRAY-01',
                 color: "Gray",
                 storage: "256GB",
                 ram: "12GB",
@@ -134,12 +135,13 @@ async function main() {
                 discountPrice: 170000,
                 stockQty: 15,
                 images: [
-                    "https://example.com/galaxyS24-gray-front.jpg",
-                    "https://example.com/galaxyS24-gray-back.jpg"
+                    "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s24-ultra-5g-sm-s928-0.jpg",
+                    "https://www.applegadgetsbd.com/_next/image?url=https%3A%2F%2Fadminapi.applegadgetsbd.com%2Fstorage%2Fmedia%2Flarge%2FGalaxy-S24-Ultra-Titanium-Gray-8816.jpg&w=2048&q=100"
                 ]
             },
             {
                 productId: galaxyS24Ultra.id,
+                productCode: 'SAMSUNG-S24-ULTRA-WHITE-01',
                 color: "White",
                 storage: "512GB",
                 ram: "12GB",
