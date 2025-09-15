@@ -1,13 +1,11 @@
 import { Router } from "express";
 import productController from "./product.controller";
 
-
-
 const productRoute = Router();
 
+productRoute.get("/", productController.getProduct);
+productRoute.post("/", productController.addProduct);
+productRoute.post("/many", productController.addManyProduct);
+productRoute.put("/:id", productController.updateProduct);
 
-productRoute.get('/', productController.getProducts);
-productRoute.post('/', productController.createProducts);
-
-
-export default productRoute
+export default productRoute;

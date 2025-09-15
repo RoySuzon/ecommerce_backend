@@ -1,127 +1,100 @@
 import { Request, Response } from "express";
 import { Prisma } from "../../../generated/prisma";
-import { default as ProductService } from "./products.service";
-
+import productsService from "./products.service";
 
 class ProductController {
-
-
-    async getProducts(req: Request, res: Response) {
-
+    // Get products
+    async getProduct(req: Request, res: Response) {
         const filter: Prisma.ProductWhereInput = {
-            // 🔹 Simple string fields
-            ...(req.query.name && { name: { contains: String(req.query.name), mode: "insensitive" } }),
-            ...(req.query.model && { model: { contains: String(req.query.model), mode: "insensitive" } }),
-            ...(req.query.productCode && { productCode: { contains: String(req.query.productCode), mode: "insensitive" } }),
-            ...(req.query.deliveryTimescale && { deliveryTimescale: { contains: String(req.query.deliveryTimescale), mode: "insensitive" } }),
-
-            // 🔹 Optional string fields
-            ...(req.query.description && { description: { contains: String(req.query.description), mode: "insensitive" } }),
-
-            // 🔹 JSON field (specifications)
-
-
-            // 🔹 Relation IDs (exact match)
-            ...(req.query.brandId && { brandId: Number(req.query.brandId) }),
-            ...(req.query.typeId && { typeId: Number(req.query.typeId) }),
-            ...(req.query.regionId && { regionId: Number(req.query.regionId) }),
-            ...(req.query.availabilityId && { availabilityId: Number(req.query.availabilityId) }),
-            ...(req.query.simTypeId && { simTypeId: Number(req.query.simTypeId) }),
-            ...(req.query.categoryId && { categoryId: Number(req.query.categoryId) }),
-
-            // 🔹 Variants (nested relation filter)
-            ...(req.query.minRegularPrice || req.query.maxRegularPrice
-                ? {
-                    variants: {
-                        some: {
-                            regularPrice: {
-                                ...(req.query.minRegularPrice && { gte: Number(req.query.minRegularPrice) }),
-                                ...(req.query.maxRegularPrice && { lte: Number(req.query.maxRegularPrice) }),
-                            },
-                        },
-                    },
-                }
-                : {}),
-
-            // 🔹 Global search (`q`) across multiple fields
-            ...(req.query.q
-                ? {
-                    OR: [
-                        { name: { contains: String(req.query.q), mode: "insensitive" } },
-
-
-                        { description: { contains: String(req.query.q), mode: "insensitive" } },
-
-                    ],
-                }
-                : {}),
+            ...(req.query.name && { name: { contains: req.query.name as string, mode: "insensitive" } }),
+            ...(req.query.productCode && { productCode: { contains: req.query.productCode as string, mode: "insensitive" } }),
+            ...(req.query.id && !isNaN(Number(req.query.id)) && { id: Number(req.query.id) }),
+            ...(req.query.brandId && !isNaN(Number(req.query.brandId)) && { brandId: Number(req.query.brandId) }),
+            ...(req.query.categoryId && !isNaN(Number(req.query.categoryId)) && { categoryId: Number(req.query.categoryId) }),
+            ...(req.query.availabilityId && !isNaN(Number(req.query.availabilityId)) && { availabilityId: Number(req.query.availabilityId) }),
         };
+
         try {
-            const result = await ProductService.fetchProduct(filter);
-
-            res.status(401).json(result);
-
-
-        } catch (error) {
-
+            const data = await productsService.fetchProduct(filter);
+            return res.success({ data });
+        } catch (error: any) {
+            return res.error({ message: error.message, errors: error });
         }
     }
-    async createProducts(req: Request, res: Response) {
 
-        // const {
-        //     name,
-        //     brandId,
-        //     model,
-        //     productCode,
-        //     availabilityId,
-        //     deliveryTimescale,
-        //     specifications,
-        //     typeId,
-        //     simTypeId,
-        //     regionId,
-        //     categoryId,
-        //     description,
-        // } = req.body;
-
-        // // Validate mandatory fields
-        // if (
-        //     !name ||
-        //     !brandId ||
-        //     !model ||
-        //     !productCode ||
-        //     !availabilityId ||
-        //     !deliveryTimescale ||
-        //     !typeId ||
-        //     !simTypeId ||
-        //     !regionId ||
-        //     !categoryId
-        // ) {
-        //     return res.status(400).json({ message: "Missing required fields" });
-        // }
-        // const productData: Prisma.ProductCreateInput = {
-        //     name,
-
-        //     // model,
-        //     // productCode,
-        //     // deliveryTimescale,
-        //     description: description || undefined,
-        //     specifications: specifications || undefined, // should be a valid JSON object
-        //     brand: { connect: { id: brandId } },
-        //     // availability: { connect: { id: availabilityId } },
-        //     // type: { connect: { id: typeId } },
-        //     // simType: { connect: { id: simTypeId } },
-        //     // region: { connect: { id: regionId } },
-        //     // category: { connect: { id: categoryId } },
-        // };
-
+    // Add single product
+    async addProduct(req: Request, res: Response) {
         try {
-            // const newProduct = await productsService.createProduct(productData)
-            // res.json(newProduct);
+            const { name, model, productCode, description, deliveryTimescale, specifications, brandId, categoryId, availabilityId } = req.body;
+
+            if (!name || !productCode || !brandId || !categoryId || !availabilityId) {
+                return res.error({ message: "Missing required fields", statusCode: 400 });
+            }
+
+            const data = await productsService.insertProduct({
+                name,
+                model,
+                productCode,
+                description,
+                deliveryTimescale,
+                specifications,
+                brand: { connect: { id: brandId } },
+                category: { connect: { id: categoryId } },
+                availability: { connect: { id: availabilityId } },
+            });
+
+            return res.success({ data, statusCode: 201 });
         } catch (error: any) {
-            res.json({ message: error.message });
+            return res.error({ message: "Internal server error", errors: error });
+        }
+    }
+
+    // Add multiple products
+    async addManyProduct(req: Request, res: Response) {
+        try {
+            const products = req.body.products;
+
+            if (!Array.isArray(products) || products.length === 0) {
+                return res.error({ message: "Products array is required", statusCode: 400 });
+            }
+
+            const data = await productsService.insertManyProduct(products);
+            return res.success({ data, statusCode: 201 });
+        } catch (error: any) {
+            return res.error({ message: "Internal server error", errors: error });
+        }
+    }
+
+    // Update product
+    async updateProduct(req: Request, res: Response) {
+        try {
+            const id = Number(req.params.id);
+            const { name, model, productCode, description, deliveryTimescale, specifications, brandId, categoryId, availabilityId } = req.body;
+
+            if (isNaN(id)) return res.error({ message: "Invalid product id", statusCode: 400 });
+
+            const updateData: Prisma.ProductUpdateInput = {
+                ...(name && { name }),
+                ...(model && { model }),
+                ...(productCode && { productCode }),
+                ...(description && { description }),
+                ...(deliveryTimescale && { deliveryTimescale }),
+                ...(specifications && { specifications }),
+                ...(brandId && { brand: { connect: { id: brandId } } }),
+                ...(categoryId && { category: { connect: { id: categoryId } } }),
+                ...(availabilityId && { availability: { connect: { id: availabilityId } } }),
+            };
+
+            if (Object.keys(updateData).length === 0) {
+                return res.error({ message: "Nothing to update", statusCode: 400 });
+            }
+
+            const updatedProduct = await productsService.updateProduct(id, updateData);
+            return res.success({ data: updatedProduct, statusCode: 200 });
+        } catch (error: any) {
+            return res.error({ message: "Internal server error", errors: error });
         }
     }
 }
 
-
-export default new ProductController
+export default new ProductController();

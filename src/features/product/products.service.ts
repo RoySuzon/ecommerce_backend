@@ -1,39 +1,40 @@
-
 import { Prisma } from "../../../generated/prisma";
 import prisma from "../../prisma";
 
 class ProductService {
-
-
-    async fetchProduct(filter: Prisma.ProductWhereInput) {
+    // Fetch products with optional filters
+    async fetchProduct(where: Prisma.ProductWhereInput) {
         return await prisma.product.findMany({
-            where: filter,
-            include: {
+            where, include: {
+                brand: true,
                 category: true,
                 availability: true,
-                brand: true,
-                variants: true
-
+                variants: true,
+                specificationsRel: true
             }
-            // include: { videos: true, brand: true, type: true, region: true, availability: true, simType: true, category: true },
-        })
-    }
-    async fetchVariant(id: number) {
-        return await prisma.productVariant.findUnique({
-            where: {
-                id: id
-            }
-        })
-
+        });
     }
 
+    // Insert single product
+    async insertProduct(data: Prisma.ProductCreateInput) {
+        return await prisma.product.create({ data });
+    }
 
-    async createProduct(product: Prisma.ProductCreateInput) {
-        return await prisma.product.create({
-            data: product
-        })
+    // Insert multiple products
+    async insertManyProduct(data: Prisma.ProductCreateManyInput[]) {
+        return await prisma.product.createMany({
+            data,
+            skipDuplicates: true,
+        });
+    }
+
+    // Update product
+    async updateProduct(id: number, data: Prisma.ProductUpdateInput) {
+        return await prisma.product.update({
+            where: { id },
+            data,
+        });
     }
 }
 
-
-export default new ProductService
+export default new ProductService();
