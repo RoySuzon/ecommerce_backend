@@ -101,3 +101,29 @@ model Specification {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model SpecificationsType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  AllSpecifications AllSpecifications[]
+}
+
+model AllSpecifications {
+  id        Int                @id @default(autoincrement())
+  value     String
+  typeId    Int
+  type      SpecificationsType @relation(fields: [typeId], references: [id])
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model ProductSpecification {
+  id              Int @id @default(autoincrement())
+  productId       Int
+  specificationId Int
+  // product           Product           @relation(fields: [productId], references: [id])
+  // specification     AllSpecifications @relation(fields: [specificationId], references: [id])
+}

@@ -171,6 +171,87 @@ async function main() {
         ]
     });
 
+    const ramType = await prisma.specificationsType.create({
+        data: {
+            name: "RAM",
+            AllSpecifications: {
+                create: [
+                    { value: "4 GB" },
+                    { value: "8 GB" },
+                    { value: "16 GB" },
+                    { value: "32 GB" },
+                ],
+            },
+        },
+        include: { AllSpecifications: true },
+    });
+
+    // Storage
+    const storageType = await prisma.specificationsType.create({
+        data: {
+            name: "Storage",
+            AllSpecifications: {
+                create: [
+                    { value: "64 GB" },
+                    { value: "128 GB" },
+                    { value: "256 GB" },
+                    { value: "512 GB" },
+                    { value: "1 TB" },
+                ],
+            },
+        },
+        include: { AllSpecifications: true },
+    });
+
+    // Processor
+    const processorType = await prisma.specificationsType.create({
+        data: {
+            name: "Processor",
+            AllSpecifications: {
+                create: [
+                    { value: "Intel i5" },
+                    { value: "Intel i7" },
+                    { value: "Intel i9" },
+                    { value: "Apple M1" },
+                    { value: "Apple M2" },
+                    { value: "AMD Ryzen 7" },
+                ],
+            },
+        },
+        include: { AllSpecifications: true },
+    });
+
+    // Display
+    const displayType = await prisma.specificationsType.create({
+        data: {
+            name: "Display",
+            AllSpecifications: {
+                create: [
+                    { value: "13 inch FHD" },
+                    { value: "15 inch FHD" },
+                    { value: "14 inch 2K" },
+                    { value: "16 inch 4K" },
+                ],
+            },
+        },
+        include: { AllSpecifications: true },
+    });
+
+    // Battery
+    const batteryType = await prisma.specificationsType.create({
+        data: {
+            name: "Battery",
+            AllSpecifications: {
+                create: [
+                    { value: "4000 mAh" },
+                    { value: "5000 mAh" },
+                    { value: "6000 mAh" },
+                ],
+            },
+        },
+        include: { AllSpecifications: true },
+    });
+
     console.log("✅ Database seeded successfully with demo products!");
 }
 
