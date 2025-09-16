@@ -24,7 +24,7 @@ class ProductVariantController {
     // Add single ProductVariant
     async addProductVariant(req: Request, res: Response) {
         try {
-            const { color, storage, ram, regularPrice, discountPrice, stockQty, images, productId, productCode } = req.body;
+            const { ram, regularPrice, discountPrice, stockQty, images, productId, productCode } = req.body;
 
             if (!regularPrice || !productId || !productCode) {
                 return res.error({ message: "regularPrice , productId , productCode are required", statusCode: 400 });
@@ -32,9 +32,7 @@ class ProductVariantController {
 
             const data = await productVariantService.insertProductVariant({
                 productCode:
-                    color,
-                storage,
-                ram,
+                    ram,
                 regularPrice,
                 discountPrice,
                 stockQty: stockQty ?? 0,

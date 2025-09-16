@@ -5,12 +5,15 @@ class ProductService {
     // Fetch products with optional filters
     async fetchProduct(where: Prisma.ProductWhereInput) {
         return await prisma.product.findMany({
-            where, include: {
-                brand: true,
+            where,
+            take: 2,
+            include: {
                 category: true,
-                availability: true,
-                variants: true,
-                specificationsRel: true
+                specifications: {
+                    include: {
+                        specification: true
+                    }
+                }
             }
         });
     }

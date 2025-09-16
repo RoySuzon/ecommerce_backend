@@ -39,7 +39,7 @@ class ProductController {
                 specifications,
                 brand: { connect: { id: brandId } },
                 category: { connect: { id: categoryId } },
-                availability: { connect: { id: availabilityId } },
+                availability: "IN_STOCK"
             });
 
             return res.success({ data, statusCode: 201 });

@@ -17,7 +17,7 @@ datasource db {
 /// ✅ Brand Table
 model Brand {
   id       Int       @id @default(autoincrement())
-  name     String
+  name     String    @unique
   logoUrl  String?
   products Product[]
 
@@ -28,21 +28,19 @@ model Brand {
 /// ✅ Category Table
 model Category {
   id       Int       @id @default(autoincrement())
-  name     String
+  name     String    @unique
   products Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-/// ✅ Availability Table
-model Availability {
-  id       Int       @id @default(autoincrement())
-  status   String
-  products Product[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/// ✅ Availability Enum
+enum AvailabilityStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+  PREORDER
+  DISCONTINUED
 }
 
 /// ✅ Product Table
@@ -52,7 +50,6 @@ model Product {
   model             String?
   description       String?
   deliveryTimescale String?
-  specifications    Json?
 
   brandId Int
   brand   Brand @relation(fields: [brandId], references: [id])
@@ -60,48 +57,53 @@ model Product {
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
-  availabilityId Int
-  availability   Availability @relation(fields: [availabilityId], references: [id])
+  availability AvailabilityStatus
 
-  variants          ProductVariant[]
-  specificationsRel Specification[]
+  variants       ProductVariant[]
+  specifications ProductSpecification[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  ProductImage ProductImage[]
+
+  @@index([name])
+  @@index([brandId])
+  @@index([categoryId])
 }
 
 /// ✅ ProductVariant Table
 model ProductVariant {
-  id            Int      @id @default(autoincrement())
-  color         String?
-  storage       String?
-  ram           String?
-  productCode   String   @unique
+  id            Int    @id @default(autoincrement())
+  productCode   String @unique
   regularPrice  Float
   discountPrice Float?
-  stockQty      Int      @default(0)
-  images        String[]
+  stockQty      Int    @default(0)
 
   productId Int
   product   Product @relation(fields: [productId], references: [id])
+
+  images         ProductImage[]
+  specifications ProductVariantSpecification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-/// ✅ Specification Table
-model Specification {
-  id    Int    @id @default(autoincrement())
-  key   String
-  value String
+/// ✅ Product Images
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  altText   String?
+  sortOrder Int     @default(0)
 
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  variantId Int?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
 }
 
+/// ✅ Specifications System
 model SpecificationsType {
   id   Int    @id @default(autoincrement())
   name String @unique
@@ -118,12 +120,25 @@ model AllSpecifications {
   type      SpecificationsType @relation(fields: [typeId], references: [id])
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
+
+  ProductSpecification        ProductSpecification[]
+  ProductVariantSpecification ProductVariantSpecification[]
 }
 
+/// ✅ Product ↔ Specifications
 model ProductSpecification {
-  id              Int @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   productId       Int
   specificationId Int
-  // product           Product           @relation(fields: [productId], references: [id])
-  // specification     AllSpecifications @relation(fields: [specificationId], references: [id])
+  product         Product           @relation(fields: [productId], references: [id])
+  specification   AllSpecifications @relation(fields: [specificationId], references: [id])
+}
+
+/// ✅ Variant ↔ Specifications
+model ProductVariantSpecification {
+  id              Int               @id @default(autoincrement())
+  variantId       Int
+  specificationId Int
+  variant         ProductVariant    @relation(fields: [variantId], references: [id])
+  specification   AllSpecifications @relation(fields: [specificationId], references: [id])
 }

@@ -24,6 +24,11 @@ class CommonController {
                         data: await commonService.getAvailabilities(),
                         message: "Availabilities fetched successfully",
                     });
+                case "specificationType":
+                    return res.success({
+                        data: await commonService.getSpecificationTypes(),
+                        message: "Availabilities fetched successfully",
+                    });
 
                 default:
                     return res.error({

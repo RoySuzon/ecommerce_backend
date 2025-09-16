@@ -1,3 +1,4 @@
+import { AvailabilityStatus } from "../../../generated/prisma";
 import prisma from "../../prisma";
 
 class CommonService {
@@ -16,10 +17,14 @@ class CommonService {
     }
 
     async getAvailabilities() {
-        return prisma.availability.findMany({
-            select: { id: true, status: true },
-            orderBy: { id: "asc" },
-        });
+        return Object.values(AvailabilityStatus)
+    }
+
+    async getSpecificationTypes() {
+        return prisma.specificationsType.findMany({
+            select: { id: true, name: true, },
+            orderBy: { name: "asc" },
+        })
     }
 }
 

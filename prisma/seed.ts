@@ -1,258 +1,143 @@
-import prisma from "../src/prisma";
+import { PrismaClient } from "../generated/prisma";
 
+const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🌱 Seeding database with integer IDs...');
+    console.log("⏳ Start seeding large dataset...");
 
-    // --- Brand ---
-    const apple = await prisma.brand.create({
-        data: {
-            name: "Apple",
-            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/960px-Samsung_Logo.svg.png"
-        }
-    });
+    // Clean all tables
+    await prisma.productVariantSpecification.deleteMany();
+    await prisma.productSpecification.deleteMany();
+    await prisma.productImage.deleteMany();
+    await prisma.productVariant.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.allSpecifications.deleteMany();
+    await prisma.specificationsType.deleteMany();
+    await prisma.brand.deleteMany();
+    await prisma.category.deleteMany();
 
-    const samsung = await prisma.brand.create({
-        data: {
-            name: "Samsung",
-            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/120px-Apple_logo_black.svg.png"
-        }
-    });
+    // Brands
+    const brandsData = [
+        { name: "Apple" },
+        { name: "Samsung" },
+        { name: "OnePlus" },
+        { name: "Xiaomi" },
+        { name: "Dell" },
+    ];
+    await prisma.brand.createMany({ data: brandsData, skipDuplicates: true });
+    const brands = await prisma.brand.findMany();
 
-    // --- Category ---
-    const mobile = await prisma.category.create({
-        data: { name: "Mobile" }
-    });
+    // Categories
+    const categoriesData = ["Smartphone", "Tablet", "Laptop", "Accessories"];
+    await prisma.category.createMany({ data: categoriesData.map((name) => ({ name })), skipDuplicates: true });
+    const categories = await prisma.category.findMany();
 
-    const laptop = await prisma.category.create({
-        data: { name: "Laptop" }
-    });
+    // Specification Types
+    const specTypesData = ["RAM", "Storage", "Color", "Processor", "Display"];
+    await prisma.specificationsType.createMany({ data: specTypesData.map((name) => ({ name })), skipDuplicates: true });
+    const specTypes = await prisma.specificationsType.findMany();
 
-    // --- Availability ---
-    const inStock = await prisma.availability.create({
-        data: { status: "In Stock" }
-    });
+    // AllSpecifications
+    const ramSpec = ["4GB", "6GB", "8GB", "12GB", "16GB"];
+    const storageSpec = ["64GB", "128GB", "256GB", "512GB", "1TB"];
+    const colorSpec = ["Black", "White", "Red", "Blue", "Green"];
+    const processorSpec = ["Snapdragon 888", "Apple A15", "Intel i5", "Intel i7", "AMD Ryzen 5"];
+    const displaySpec = ["6.1 inch", "6.7 inch", "12 inch", "13 inch", "15 inch"];
 
-    const preOrder = await prisma.availability.create({
-        data: { status: "Pre-order" }
-    });
+    const allSpecsData = [
+        ...ramSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "RAM")!.id })),
+        ...storageSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Storage")!.id })),
+        ...colorSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Color")!.id })),
+        ...processorSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Processor")!.id })),
+        ...displaySpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Display")!.id })),
+    ];
 
-    // --- Product: iPhone 15 Pro Max ---
-    const iphone15ProMax = await prisma.product.create({
-        data: {
-            name: "iPhone 15 Pro Max",
-            model: "Pro Max",
-            description: "The latest iPhone 15 Pro Max with A17 Bionic chip and Titanium body.",
-            deliveryTimescale: "2-3 Days",
-            specifications: {
-                Display: "6.7-inch OLED",
-                Battery: "4500mAh",
-                Processor: "A17 Pro",
-            },
-            brandId: apple.id,
-            categoryId: mobile.id,
-            availabilityId: inStock.id,
-        }
-    });
+    await prisma.allSpecifications.createMany({ data: allSpecsData, skipDuplicates: true });
+    const allSpecs = await prisma.allSpecifications.findMany();
 
-    // --- Variants for iPhone 15 Pro Max ---
-    await prisma.productVariant.createMany({
-        data: [
-            {
-                productId: iphone15ProMax.id,
-                productCode: "IPHONE-16-PRO-MAX-BLUE-01",
-                color: "Blue",
-                storage: "256GB",
-                ram: "8GB",
-                regularPrice: 170000,
-                discountPrice: 160000,
-                stockQty: 10,
-                images: [
-                    "https://example.com/iphone15-blue-front.jpg",
-                    "https://example.com/iphone15-blue-back.jpg"
-                ]
-            },
-            {
-                productId: iphone15ProMax.id,
-                productCode: 'IPHONE-16-PRO-MAX-BLACK-01',
-                color: "Black",
-                storage: "512GB",
-                ram: "8GB",
-                regularPrice: 190000,
-                discountPrice: 180000,
-                stockQty: 5,
-                images: [
-                    "https://example.com/iphone15-black-front.jpg",
-                    "https://example.com/iphone15-black-back.jpg"
-                ]
+    // Helper maps
+    const ramMap = allSpecs.filter((s) => s.typeId === specTypes.find((t) => t.name === "RAM")!.id);
+    const storageMap = allSpecs.filter((s) => s.typeId === specTypes.find((t) => t.name === "Storage")!.id);
+    const colorMap = allSpecs.filter((s) => s.typeId === specTypes.find((t) => t.name === "Color")!.id);
+
+    // ------------------------
+    // Create >1000 products with variants
+    // ------------------------
+    let productCount = 0;
+
+    for (const category of categories) {
+        for (let b = 0; b < brands.length; b++) {
+            for (let i = 1; i <= 50; i++) { // 50 products per brand/category → 50×5×4 ≈ 1000+
+                const productName = `${brands[b].name} ${category.name} Model ${i}`;
+                const product = await prisma.product.create({
+                    data: {
+                        name: productName,
+                        model: `Model-${i}`,
+                        description: `Description of ${productName}`,
+                        deliveryTimescale: "3-5 days",
+                        brandId: brands[b].id,
+                        categoryId: category.id,
+                        availability: "IN_STOCK",
+                    },
+                });
+
+                // Add ProductVariants: RAM × Storage × Color → 5×5×5 = 125 variants per product
+                for (const ram of ramMap) {
+                    for (const storage of storageMap) {
+                        for (const color of colorMap) {
+                            const variantCode = `${productName}-${ram.value}-${storage.value}-${color.value}`.replace(/\s+/g, "");
+                            const basePrice = 500;
+                            const ramPrice = parseInt(ram.value) * 10; // 4GB→40
+                            const storagePrice = parseInt(storage.value) || 0; // 128GB→128
+                            const price = basePrice + ramPrice + storagePrice;
+
+                            const variant = await prisma.productVariant.create({
+                                data: {
+                                    productCode: variantCode,
+                                    regularPrice: price,
+                                    discountPrice: price - 50,
+                                    stockQty: 100,
+                                    productId: product.id,
+                                    images: {
+                                        create: [
+                                            { url: `https://dummyimage.com/400x400/${color.value.toLowerCase()}`, altText: color.value },
+                                        ],
+                                    },
+                                },
+                            });
+
+                            // Link ProductVariantSpecifications
+                            await prisma.productVariantSpecification.createMany({
+                                data: [
+                                    { variantId: variant.id, specificationId: ram.id },
+                                    { variantId: variant.id, specificationId: storage.id },
+                                    { variantId: variant.id, specificationId: color.id },
+                                ],
+                            });
+
+                            // Link ProductSpecifications (once per product)
+                            const exists = await prisma.productSpecification.findFirst({
+                                where: { productId: product.id, specificationId: ram.id },
+                            });
+                            if (!exists) {
+                                await prisma.productSpecification.createMany({
+                                    data: [
+                                        { productId: product.id, specificationId: ram.id },
+                                        { productId: product.id, specificationId: storage.id },
+                                        { productId: product.id, specificationId: color.id },
+                                    ],
+                                });
+                            }
+                        }
+                    }
+                }
+                productCount++;
+                console.log(`Created product ${productCount}: ${productName}`);
             }
-        ]
-    });
-
-    // --- Specification Table (extra structured specs) ---
-    await prisma.specification.createMany({
-        data: [
-            {
-                productId: iphone15ProMax.id,
-                key: "Camera",
-                value: "48MP + 12MP Ultra Wide"
-            },
-            {
-                productId: iphone15ProMax.id,
-                key: "OS",
-                value: "iOS 17"
-            }
-        ]
-    });
-
-    // --- Another Product: Samsung Galaxy S24 Ultra ---
-    const galaxyS24Ultra = await prisma.product.create({
-        data: {
-            name: "Samsung Galaxy S24 Ultra",
-            model: "Ultra",
-            description: "Samsung’s flagship Galaxy S24 Ultra with Snapdragon 8 Gen 3.",
-            deliveryTimescale: "3-5 Days",
-            specifications: {
-                Display: "6.8-inch AMOLED",
-                Battery: "5000mAh",
-                Processor: "Snapdragon 8 Gen 3",
-            },
-            brandId: samsung.id,
-            categoryId: mobile.id,
-            availabilityId: preOrder.id,
         }
-    });
+    }
 
-    await prisma.productVariant.createMany({
-        data: [
-            {
-                productId: galaxyS24Ultra.id,
-                productCode: 'SAMSUNG-S24-ULTRA-GRAY-01',
-                color: "Gray",
-                storage: "256GB",
-                ram: "12GB",
-                regularPrice: 180000,
-                discountPrice: 170000,
-                stockQty: 15,
-                images: [
-                    "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s24-ultra-5g-sm-s928-0.jpg",
-                    "https://www.applegadgetsbd.com/_next/image?url=https%3A%2F%2Fadminapi.applegadgetsbd.com%2Fstorage%2Fmedia%2Flarge%2FGalaxy-S24-Ultra-Titanium-Gray-8816.jpg&w=2048&q=100"
-                ]
-            },
-            {
-                productId: galaxyS24Ultra.id,
-                productCode: 'SAMSUNG-S24-ULTRA-WHITE-01',
-                color: "White",
-                storage: "512GB",
-                ram: "12GB",
-                regularPrice: 200000,
-                discountPrice: 190000,
-                stockQty: 7,
-                images: [
-                    "https://example.com/galaxyS24-white-front.jpg",
-                    "https://example.com/galaxyS24-white-back.jpg"
-                ]
-            }
-        ]
-    });
-
-    await prisma.specification.createMany({
-        data: [
-            {
-                productId: galaxyS24Ultra.id,
-                key: "Camera",
-                value: "200MP + 12MP Ultra Wide + 10MP Telephoto"
-            },
-            {
-                productId: galaxyS24Ultra.id,
-                key: "OS",
-                value: "Android 14 (One UI 6)"
-            }
-        ]
-    });
-
-    const ramType = await prisma.specificationsType.create({
-        data: {
-            name: "RAM",
-            AllSpecifications: {
-                create: [
-                    { value: "4 GB" },
-                    { value: "8 GB" },
-                    { value: "16 GB" },
-                    { value: "32 GB" },
-                ],
-            },
-        },
-        include: { AllSpecifications: true },
-    });
-
-    // Storage
-    const storageType = await prisma.specificationsType.create({
-        data: {
-            name: "Storage",
-            AllSpecifications: {
-                create: [
-                    { value: "64 GB" },
-                    { value: "128 GB" },
-                    { value: "256 GB" },
-                    { value: "512 GB" },
-                    { value: "1 TB" },
-                ],
-            },
-        },
-        include: { AllSpecifications: true },
-    });
-
-    // Processor
-    const processorType = await prisma.specificationsType.create({
-        data: {
-            name: "Processor",
-            AllSpecifications: {
-                create: [
-                    { value: "Intel i5" },
-                    { value: "Intel i7" },
-                    { value: "Intel i9" },
-                    { value: "Apple M1" },
-                    { value: "Apple M2" },
-                    { value: "AMD Ryzen 7" },
-                ],
-            },
-        },
-        include: { AllSpecifications: true },
-    });
-
-    // Display
-    const displayType = await prisma.specificationsType.create({
-        data: {
-            name: "Display",
-            AllSpecifications: {
-                create: [
-                    { value: "13 inch FHD" },
-                    { value: "15 inch FHD" },
-                    { value: "14 inch 2K" },
-                    { value: "16 inch 4K" },
-                ],
-            },
-        },
-        include: { AllSpecifications: true },
-    });
-
-    // Battery
-    const batteryType = await prisma.specificationsType.create({
-        data: {
-            name: "Battery",
-            AllSpecifications: {
-                create: [
-                    { value: "4000 mAh" },
-                    { value: "5000 mAh" },
-                    { value: "6000 mAh" },
-                ],
-            },
-        },
-        include: { AllSpecifications: true },
-    });
-
-    console.log("✅ Database seeded successfully with demo products!");
+    console.log("✅ Seed completed with 1000+ products, variants, and specifications!");
 }
 
 main()
