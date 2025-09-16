@@ -12,11 +12,18 @@ class ProductController {
             ...(req.query.brandId && !isNaN(Number(req.query.brandId)) && { brandId: Number(req.query.brandId) }),
             ...(req.query.categoryId && !isNaN(Number(req.query.categoryId)) && { categoryId: Number(req.query.categoryId) }),
             ...(req.query.availabilityId && !isNaN(Number(req.query.availabilityId)) && { availabilityId: Number(req.query.availabilityId) }),
+            ...(req.query.variantId && !isNaN(Number(req.query.variantId)) && { variants: { some: { id: Number(req.query.variantId) } } }),
         };
 
         try {
             const data = await productsService.fetchProduct(filter);
-            return res.success({ data });
+
+            const producst = data.map(({ variants, ...rest }) => ({
+                ...rest,
+                variants: variants.map(({ specifications, ...e }) => ({ ...e, specifications: specifications.map((e) => ({ key: e.specification.type.name, value: e.specification.value })) })),
+
+            }))
+            return res.success({ data: producst });
         } catch (error: any) {
             return res.error({ message: error.message, errors: error });
         }

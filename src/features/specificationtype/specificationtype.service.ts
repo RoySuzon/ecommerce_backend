@@ -2,11 +2,15 @@ import { Prisma } from "../../../generated/prisma";
 import prisma from "../../prisma";
 
 class SpecificationtypeService {
-    async insert() {
+    async insert(data: Prisma.SpecificationsTypeCreateInput) {
+        return await prisma.specificationsType.create({ data })
         // TODO: implement insert logic
     }
 
-    async insertMany() {
+
+    async insertMany(data: Prisma.SpecificationsTypeCreateManyAndReturnArgs) {
+
+        return await prisma.specificationsType.createManyAndReturn(data)
         // TODO: implement bulk insert logic
     }
 

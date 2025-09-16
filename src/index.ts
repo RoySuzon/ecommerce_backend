@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger-output.json';
+import allspecificationsRoute from "./features/allspecifications/allspecifications.route";
 import brandRoute from "./features/brand/brand.route";
 import categoryRoute from "./features/category/category.route";
 import commonRoute from "./features/common/common.route";
@@ -24,6 +25,7 @@ app.use('/brand', brandRoute)
 app.use('/variant', productVariantRoute)
 app.use('/common', commonRoute)
 app.use('/specificationtype', specificationtypeRoute)
+app.use('/allspecifications', allspecificationsRoute)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 

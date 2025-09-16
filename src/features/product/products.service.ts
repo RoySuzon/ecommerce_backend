@@ -6,12 +6,22 @@ class ProductService {
     async fetchProduct(where: Prisma.ProductWhereInput) {
         return await prisma.product.findMany({
             where,
-            take: 2,
+            // take: 2,
             include: {
                 category: true,
-                specifications: {
+                variants: {
+                    where: {
+                        id: where.variants?.some?.id
+                    },
                     include: {
-                        specification: true
+                        // product: true,
+                        specifications: {
+                            include: {
+                                specification: {
+                                    include: { type: { select: { name: true } } }
+                                }
+                            }
+                        }
                     }
                 }
             }

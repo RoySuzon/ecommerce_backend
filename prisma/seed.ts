@@ -1,11 +1,11 @@
-import { PrismaClient } from "../generated/prisma";
+import { AvailabilityStatus, Prisma, PrismaClient } from "../generated/prisma";
 
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log("⏳ Start seeding large dataset...");
+    console.log("⏳ Start seeding manual devices...");
 
-    // Clean all tables
+    // Clean tables
     await prisma.productVariantSpecification.deleteMany();
     await prisma.productSpecification.deleteMany();
     await prisma.productImage.deleteMany();
@@ -17,18 +17,16 @@ async function main() {
     await prisma.category.deleteMany();
 
     // Brands
-    const brandsData = [
+    const brandsData: Prisma.BrandCreateInput[] = [
         { name: "Apple" },
         { name: "Samsung" },
         { name: "OnePlus" },
-        { name: "Xiaomi" },
-        { name: "Dell" },
     ];
     await prisma.brand.createMany({ data: brandsData, skipDuplicates: true });
     const brands = await prisma.brand.findMany();
 
     // Categories
-    const categoriesData = ["Smartphone", "Tablet", "Laptop", "Accessories"];
+    const categoriesData = ["Smartphone", "Tablet", "Laptop"];
     await prisma.category.createMany({ data: categoriesData.map((name) => ({ name })), skipDuplicates: true });
     const categories = await prisma.category.findMany();
 
@@ -37,19 +35,23 @@ async function main() {
     await prisma.specificationsType.createMany({ data: specTypesData.map((name) => ({ name })), skipDuplicates: true });
     const specTypes = await prisma.specificationsType.findMany();
 
-    // AllSpecifications
-    const ramSpec = ["4GB", "6GB", "8GB", "12GB", "16GB"];
-    const storageSpec = ["64GB", "128GB", "256GB", "512GB", "1TB"];
-    const colorSpec = ["Black", "White", "Red", "Blue", "Green"];
-    const processorSpec = ["Snapdragon 888", "Apple A15", "Intel i5", "Intel i7", "AMD Ryzen 5"];
-    const displaySpec = ["6.1 inch", "6.7 inch", "12 inch", "13 inch", "15 inch"];
-
+    // AllSpecifications (manual)
     const allSpecsData = [
-        ...ramSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "RAM")!.id })),
-        ...storageSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Storage")!.id })),
-        ...colorSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Color")!.id })),
-        ...processorSpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Processor")!.id })),
-        ...displaySpec.map((v) => ({ value: v, typeId: specTypes.find((t) => t.name === "Display")!.id })),
+        // RAM
+        { value: "4GB", typeId: specTypes.find((t) => t.name === "RAM")!.id },
+        { value: "8GB", typeId: specTypes.find((t) => t.name === "RAM")!.id },
+        // Storage
+        { value: "64GB", typeId: specTypes.find((t) => t.name === "Storage")!.id },
+        { value: "128GB", typeId: specTypes.find((t) => t.name === "Storage")!.id },
+        // Color
+        { value: "Black", typeId: specTypes.find((t) => t.name === "Color")!.id },
+        { value: "White", typeId: specTypes.find((t) => t.name === "Color")!.id },
+        // Processor
+        { value: "Snapdragon 888", typeId: specTypes.find((t) => t.name === "Processor")!.id },
+        { value: "Apple A15", typeId: specTypes.find((t) => t.name === "Processor")!.id },
+        // Display
+        { value: "6.1 inch", typeId: specTypes.find((t) => t.name === "Display")!.id },
+        { value: "6.7 inch", typeId: specTypes.find((t) => t.name === "Display")!.id },
     ];
 
     await prisma.allSpecifications.createMany({ data: allSpecsData, skipDuplicates: true });
@@ -60,84 +62,109 @@ async function main() {
     const storageMap = allSpecs.filter((s) => s.typeId === specTypes.find((t) => t.name === "Storage")!.id);
     const colorMap = allSpecs.filter((s) => s.typeId === specTypes.find((t) => t.name === "Color")!.id);
 
-    // ------------------------
-    // Create >1000 products with variants
-    // ------------------------
+    // Manual products
+    const devices = [
+        {
+            brand: "Apple",
+            category: "Smartphone",
+            name: "iPhone 13",
+            model: "iPhone-13",
+            deliveryTimescale: "3-5 days",
+            availability: "IN_STOCK",
+        },
+        {
+            brand: "Samsung",
+            category: "Smartphone",
+            name: "Galaxy S21",
+            model: "Galaxy-S21",
+            deliveryTimescale: "2-4 days",
+            availability: "IN_STOCK",
+        },
+        {
+            brand: "OnePlus",
+            category: "Smartphone",
+            name: "OnePlus 10",
+            model: "OnePlus-10",
+            deliveryTimescale: "3-6 days",
+            availability: "IN_STOCK",
+        },
+    ];
+
     let productCount = 0;
 
-    for (const category of categories) {
-        for (let b = 0; b < brands.length; b++) {
-            for (let i = 1; i <= 50; i++) { // 50 products per brand/category → 50×5×4 ≈ 1000+
-                const productName = `${brands[b].name} ${category.name} Model ${i}`;
-                const product = await prisma.product.create({
-                    data: {
-                        name: productName,
-                        model: `Model-${i}`,
-                        description: `Description of ${productName}`,
-                        deliveryTimescale: "3-5 days",
-                        brandId: brands[b].id,
-                        categoryId: category.id,
-                        availability: "IN_STOCK",
-                    },
-                });
+    for (const device of devices) {
+        const brand = brands.find((b) => b.name === device.brand)!;
+        const category = categories.find((c) => c.name === device.category)!;
+        const availabilityValues = Object.values(AvailabilityStatus);
 
-                // Add ProductVariants: RAM × Storage × Color → 5×5×5 = 125 variants per product
-                for (const ram of ramMap) {
-                    for (const storage of storageMap) {
-                        for (const color of colorMap) {
-                            const variantCode = `${productName}-${ram.value}-${storage.value}-${color.value}`.replace(/\s+/g, "");
-                            const basePrice = 500;
-                            const ramPrice = parseInt(ram.value) * 10; // 4GB→40
-                            const storagePrice = parseInt(storage.value) || 0; // 128GB→128
-                            const price = basePrice + ramPrice + storagePrice;
+        // Function to get a random enum value
+        function getRandomAvailability(): AvailabilityStatus {
+            const randomIndex = Math.floor(Math.random() * availabilityValues.length);
+            return availabilityValues[randomIndex] as AvailabilityStatus;
+        }
 
-                            const variant = await prisma.productVariant.create({
-                                data: {
-                                    productCode: variantCode,
-                                    regularPrice: price,
-                                    discountPrice: price - 50,
-                                    stockQty: 100,
-                                    productId: product.id,
-                                    images: {
-                                        create: [
-                                            { url: `https://dummyimage.com/400x400/${color.value.toLowerCase()}`, altText: color.value },
-                                        ],
-                                    },
-                                },
-                            });
+        // Example usage:
+        const randomStatus = getRandomAvailability();
+        const product = await prisma.product.create({
+            data: {
+                name: device.name,
+                model: device.model,
+                description: `Description of ${device.name}`,
+                deliveryTimescale: device.deliveryTimescale,
+                brandId: brand.id,
+                categoryId: category.id,
+                availability: getRandomAvailability()
+            },
+        });
 
-                            // Link ProductVariantSpecifications
-                            await prisma.productVariantSpecification.createMany({
-                                data: [
-                                    { variantId: variant.id, specificationId: ram.id },
-                                    { variantId: variant.id, specificationId: storage.id },
-                                    { variantId: variant.id, specificationId: color.id },
-                                ],
-                            });
+        // Create one variant per combination (RAM × Storage × Color)
+        for (const ram of ramMap) {
+            for (const storage of storageMap) {
+                for (const color of colorMap) {
+                    const variantCode = `${device.name}-${ram.value}-${storage.value}-${color.value}`.replace(/\s+/g, "");
+                    const basePrice = 500;
+                    const ramPrice = parseInt(ram.value) * 10;
+                    const storagePrice = parseInt(storage.value) || 0;
+                    const price = basePrice + ramPrice + storagePrice;
 
-                            // Link ProductSpecifications (once per product)
-                            const exists = await prisma.productSpecification.findFirst({
-                                where: { productId: product.id, specificationId: ram.id },
-                            });
-                            if (!exists) {
-                                await prisma.productSpecification.createMany({
-                                    data: [
-                                        { productId: product.id, specificationId: ram.id },
-                                        { productId: product.id, specificationId: storage.id },
-                                        { productId: product.id, specificationId: color.id },
-                                    ],
-                                });
-                            }
-                        }
-                    }
+                    const variant = await prisma.productVariant.create({
+                        data: {
+                            productCode: variantCode,
+                            regularPrice: price,
+                            discountPrice: price - 50,
+                            stockQty: 50,
+                            productId: product.id,
+                            images: {
+                                create: [{ url: `https://dummyimage.com/400x400/${color.value.toLowerCase()}`, altText: color.value }],
+                            },
+                        },
+                    });
+
+                    await prisma.productVariantSpecification.createMany({
+                        data: [
+                            { variantId: variant.id, specificationId: ram.id },
+                            { variantId: variant.id, specificationId: storage.id },
+                            { variantId: variant.id, specificationId: color.id },
+                        ],
+                    });
+
+                    await prisma.productSpecification.createMany({
+                        data: [
+                            { productId: product.id, specificationId: ram.id },
+                            { productId: product.id, specificationId: storage.id },
+                            { productId: product.id, specificationId: color.id },
+                        ],
+                        skipDuplicates: true,
+                    });
                 }
-                productCount++;
-                console.log(`Created product ${productCount}: ${productName}`);
             }
         }
+
+        productCount++;
+        console.log(`✅ Created product ${productCount}: ${device.name}`);
     }
 
-    console.log("✅ Seed completed with 1000+ products, variants, and specifications!");
+    console.log("🎉 Seed completed with manual devices!");
 }
 
 main()
