@@ -1,3 +1,5 @@
+import prisma from "../../prisma";
+
 class ProductvariantsService {
     async insert() {
         // TODO: implement insert logic
@@ -15,7 +17,8 @@ class ProductvariantsService {
         // TODO: implement delete logic
     }
 
-    async fetch() {
+    async fetch(where: any) {
+        return await prisma.productVariant.findMany({ where, select: {} });
         // TODO: implement fetch logic
     }
 }
