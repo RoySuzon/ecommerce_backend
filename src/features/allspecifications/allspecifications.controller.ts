@@ -4,6 +4,7 @@ import allspecificationsService from "./allspecifications.service";
 
 class AllspecificationsController {
     async add(req: Request, res: Response) {
+        //  #swagger.tags = ['All Specifications']
         try {
             const result = await allspecificationsService.insert();
             return res.success({ data: result, message: "" });
@@ -13,6 +14,7 @@ class AllspecificationsController {
     }
 
     async addMany(req: Request, res: Response) {
+        //  #swagger.tags = ['All Specifications']
         try {
             const result = await allspecificationsService.insertMany();
             return res.success({ data: result, message: "" });
@@ -22,6 +24,7 @@ class AllspecificationsController {
     }
 
     async update(req: Request, res: Response) {
+        //  #swagger.tags = ['All Specifications']
         try {
             const result = await allspecificationsService.update();
             return res.success({ data: result, message: "" });
@@ -31,6 +34,7 @@ class AllspecificationsController {
     }
 
     async delete(req: Request, res: Response) {
+        //  #swagger.tags = ['All Specifications']
         try {
             const result = await allspecificationsService.delete();
             return res.success({ data: result, message: "" });
@@ -40,6 +44,7 @@ class AllspecificationsController {
     }
 
     async get(req: Request, res: Response) {
+        //  #swagger.tags = ['All Specifications']
         try {
 
             const data: Prisma.AllSpecificationsWhereInput = {
@@ -57,6 +62,7 @@ class AllspecificationsController {
         }
     }
     async getSpecificationByProductId(req: Request, res: Response) {
+        //  #swagger.tags = ['All Specifications']
         try {
             const result = await allspecificationsService.productWiseSpecifications(Number(req.params.id));
             const newResult = result.map(({ type, ...item }) => ({

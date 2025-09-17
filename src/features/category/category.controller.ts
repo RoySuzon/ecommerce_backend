@@ -5,6 +5,7 @@ import categoryService from "./category.service";
 class CategoryController {
 
     async getCategory(req: Request, res: Response) {
+        //  #swagger.tags = ['Category']
 
         const filter: Prisma.CategoryWhereInput = {
             ...(req.query.name && {
@@ -26,6 +27,7 @@ class CategoryController {
 
     }
     async addCategory(req: Request, res: Response) {
+        //  #swagger.tags = ['Category']
         try {
             const { name } = req.body;
 
@@ -41,6 +43,7 @@ class CategoryController {
         }
     }
     async addManyCategory(req: Request, res: Response) {
+        //  #swagger.tags = ['Category']
         try {
             const categories = req.body.categories; // expect [{name: 'A'}, {name: 'B'}]
 
@@ -55,6 +58,7 @@ class CategoryController {
         }
     }
     async updateCategory(req: Request, res: Response) {
+        //  #swagger.tags = ['Category']
         try {
             const id = Number(req.params.id);
             const { name } = req.body;

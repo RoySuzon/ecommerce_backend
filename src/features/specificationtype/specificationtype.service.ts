@@ -8,9 +8,9 @@ class SpecificationtypeService {
     }
 
 
-    async insertMany(data: Prisma.SpecificationsTypeCreateManyAndReturnArgs) {
+    async insertMany(data: Prisma.SpecificationsTypeCreateInput[]) {
 
-        return await prisma.specificationsType.createManyAndReturn(data)
+        return await prisma.specificationsType.createManyAndReturn({ data, skipDuplicates: true })
         // TODO: implement bulk insert logic
     }
 

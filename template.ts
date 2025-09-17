@@ -51,6 +51,7 @@ import ${featureName}Service from "./${featureName}.service";
 
 class ${capitalize(featureName)}Controller {
     async add(req: Request, res: Response) {
+    //  #swagger.tags = ['${capitalize(featureName)}']
         try {
             const result = await ${featureName}Service.insert();
             return res.success({ data: result, message: "" });
@@ -60,6 +61,7 @@ class ${capitalize(featureName)}Controller {
     }
 
     async addMany(req: Request, res: Response) {
+    //  #swagger.tags = ['${capitalize(featureName)}']
         try {
             const result = await ${featureName}Service.insertMany();
             return res.success({ data: result, message: "" });
@@ -69,6 +71,7 @@ class ${capitalize(featureName)}Controller {
     }
 
     async update(req: Request, res: Response) {
+    //  #swagger.tags = ['${capitalize(featureName)}']
         try {
             const result = await ${featureName}Service.update();
             return res.success({ data: result, message: "" });
@@ -78,6 +81,7 @@ class ${capitalize(featureName)}Controller {
     }
 
     async delete(req: Request, res: Response) {
+    //  #swagger.tags = ['${capitalize(featureName)}']
         try {
             const result = await ${featureName}Service.delete();
             return res.success({ data: result, message: "" });
@@ -87,6 +91,7 @@ class ${capitalize(featureName)}Controller {
     }
 
     async get(req: Request, res: Response) {
+    //  #swagger.tags = ['${capitalize(featureName)}']
         try {
             const result = await ${featureName}Service.fetch();
             return res.success({ data: result, message: "" });

@@ -3,8 +3,10 @@ import { Prisma } from "../../../generated/prisma";
 import productsService from "./products.service";
 
 class ProductController {
+
     // Get products
     async getProduct(req: Request, res: Response) {
+        //  #swagger.tags = ['Product']
         const filter: Prisma.ProductWhereInput = {
             ...(req.query.name && { name: { contains: req.query.name as string, mode: "insensitive" } }),
             ...(req.query.productCode && { productCode: { contains: req.query.productCode as string, mode: "insensitive" } }),
@@ -31,6 +33,7 @@ class ProductController {
 
     // Add single product
     async addProduct(req: Request, res: Response) {
+        //  #swagger.tags = ['Product']
         try {
             const { name, model, description, deliveryTimescale, specifications, brandId, categoryId, availabilityId } = req.body;
 
@@ -57,6 +60,7 @@ class ProductController {
 
     // Add multiple products
     async addManyProduct(req: Request, res: Response) {
+        //  #swagger.tags = ['Product']
         try {
             const products = req.body.products;
 
@@ -73,6 +77,7 @@ class ProductController {
 
     // Update product
     async updateProduct(req: Request, res: Response) {
+        //  #swagger.tags = ['Product']
         try {
             const id = Number(req.params.id);
             const { name, model, productCode, description, deliveryTimescale, specifications, brandId, categoryId, availabilityId } = req.body;

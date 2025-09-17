@@ -13,6 +13,9 @@
   "paths": {
     "/product/": {
       "get": {
+        "tags": [
+          "Product"
+        ],
         "description": "",
         "parameters": [
           {
@@ -58,6 +61,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Product"
+        ],
         "description": "",
         "parameters": [
           {
@@ -103,6 +109,9 @@
     },
     "/product/many": {
       "post": {
+        "tags": [
+          "Product"
+        ],
         "description": "",
         "parameters": [
           {
@@ -127,6 +136,9 @@
     },
     "/product/{id}": {
       "put": {
+        "tags": [
+          "Product"
+        ],
         "description": "",
         "parameters": [
           {
@@ -181,6 +193,9 @@
     },
     "/category/": {
       "get": {
+        "tags": [
+          "Category"
+        ],
         "description": "",
         "parameters": [
           {
@@ -201,6 +216,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Category"
+        ],
         "description": "",
         "parameters": [
           {
@@ -225,6 +243,9 @@
     },
     "/category/many": {
       "post": {
+        "tags": [
+          "Category"
+        ],
         "description": "",
         "parameters": [
           {
@@ -249,6 +270,9 @@
     },
     "/category/{id}": {
       "put": {
+        "tags": [
+          "Category"
+        ],
         "description": "",
         "parameters": [
           {
@@ -279,6 +303,9 @@
     },
     "/brand/": {
       "get": {
+        "tags": [
+          "Brand"
+        ],
         "description": "",
         "parameters": [
           {
@@ -299,6 +326,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Brand"
+        ],
         "description": "",
         "parameters": [
           {
@@ -326,6 +356,9 @@
     },
     "/brand/many": {
       "post": {
+        "tags": [
+          "Brand"
+        ],
         "description": "",
         "parameters": [
           {
@@ -350,6 +383,9 @@
     },
     "/brand/{id}": {
       "put": {
+        "tags": [
+          "Brand"
+        ],
         "description": "",
         "parameters": [
           {
@@ -383,6 +419,9 @@
     },
     "/variant/": {
       "get": {
+        "tags": [
+          "Variant"
+        ],
         "description": "",
         "parameters": [
           {
@@ -418,6 +457,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Variant"
+        ],
         "description": "",
         "parameters": [
           {
@@ -460,6 +502,9 @@
     },
     "/variant/many": {
       "post": {
+        "tags": [
+          "Variant"
+        ],
         "description": "",
         "parameters": [
           {
@@ -484,6 +529,9 @@
     },
     "/variant/{id}": {
       "put": {
+        "tags": [
+          "Variant"
+        ],
         "description": "",
         "parameters": [
           {
@@ -532,10 +580,23 @@
     },
     "/common/dropdown": {
       "get": {
+        "tags": [
+          "Common"
+        ],
         "description": "",
         "parameters": [
           {
             "name": "type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
             "in": "query",
             "type": "string"
           }
@@ -549,6 +610,9 @@
     },
     "/specificationtype/": {
       "get": {
+        "tags": [
+          "Specificationtype"
+        ],
         "description": "",
         "responses": {
           "default": {
@@ -557,6 +621,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Specificationtype"
+        ],
         "description": "",
         "parameters": [
           {
@@ -584,7 +651,24 @@
     },
     "/specificationtype/many": {
       "post": {
+        "tags": [
+          "Specificationtype"
+        ],
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": ""
@@ -594,6 +678,9 @@
     },
     "/specificationtype/{id}": {
       "put": {
+        "tags": [
+          "Specificationtype"
+        ],
         "description": "",
         "parameters": [
           {
@@ -610,6 +697,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "Specificationtype"
+        ],
         "description": "",
         "parameters": [
           {
@@ -628,6 +718,9 @@
     },
     "/allspecifications/": {
       "get": {
+        "tags": [
+          "All Specifications"
+        ],
         "description": "",
         "parameters": [
           {
@@ -648,6 +741,9 @@
         }
       },
       "post": {
+        "tags": [
+          "All Specifications"
+        ],
         "description": "",
         "responses": {
           "default": {
@@ -658,6 +754,9 @@
     },
     "/allspecifications/many": {
       "post": {
+        "tags": [
+          "All Specifications"
+        ],
         "description": "",
         "responses": {
           "default": {
@@ -668,6 +767,9 @@
     },
     "/allspecifications/{id}": {
       "put": {
+        "tags": [
+          "All Specifications"
+        ],
         "description": "",
         "parameters": [
           {
@@ -684,6 +786,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "All Specifications"
+        ],
         "description": "",
         "parameters": [
           {
@@ -700,6 +805,9 @@
         }
       },
       "get": {
+        "tags": [
+          "All Specifications"
+        ],
         "description": "",
         "parameters": [
           {

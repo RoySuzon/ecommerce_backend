@@ -5,6 +5,7 @@ import productVariantService from "./productVariant.service";
 class ProductVariantController {
     // Get ProductVariants
     async getProductVariant(req: Request, res: Response) {
+        //  #swagger.tags = ['Variant']
         const filter: Prisma.ProductVariantWhereInput = {
             ...(req.query.id && !isNaN(Number(req.query.id)) && { id: Number(req.query.id) }),
             ...(req.query.productId && !isNaN(Number(req.query.productId)) && { productId: Number(req.query.productId) }),
@@ -23,6 +24,7 @@ class ProductVariantController {
 
     // Add single ProductVariant
     async addProductVariant(req: Request, res: Response) {
+        //  #swagger.tags = ['Variant']
         try {
             const { ram, regularPrice, discountPrice, stockQty, images, productId, productCode } = req.body;
 
@@ -52,6 +54,7 @@ class ProductVariantController {
 
     // Add multiple ProductVariants
     async addManyProductVariant(req: Request, res: Response) {
+        //  #swagger.tags = ['Variant']
         try {
             const variants = req.body.variants;
 
@@ -68,6 +71,7 @@ class ProductVariantController {
 
     // Update ProductVariant
     async updateProductVariant(req: Request, res: Response) {
+        //  #swagger.tags = ['Variant']
         try {
             const id = Number(req.params.id);
             const { color, storage, ram, regularPrice, discountPrice, stockQty, images } = req.body;

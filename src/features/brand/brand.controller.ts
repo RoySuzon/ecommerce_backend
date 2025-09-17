@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { Prisma } from "../../../generated/prisma";
 import brandService from "./brand.service";
 
+
 class BrandController {
     // Get brands
     async getBrand(req: Request, res: Response) {
+        //  #swagger.tags = ['Brand']
         const filter: Prisma.BrandWhereInput = {
             ...(req.query.name && {
                 name: { contains: req.query.name as string, mode: "insensitive" },
@@ -24,6 +26,7 @@ class BrandController {
 
     // Add single brand
     async addBrand(req: Request, res: Response) {
+        //  #swagger.tags = ['Brand']
         try {
             const { name, logoUrl } = req.body;
 
@@ -39,6 +42,7 @@ class BrandController {
 
     // Add many brands
     async addManyBrand(req: Request, res: Response) {
+        //  #swagger.tags = ['Brand']
         try {
             const brands = req.body.brands;
 
@@ -56,6 +60,7 @@ class BrandController {
 
     // Update brand
     async updateBrand(req: Request, res: Response) {
+        //  #swagger.tags = ['Brand']
         try {
             const id = Number(req.params.id);
             const { name, logoUrl } = req.body;

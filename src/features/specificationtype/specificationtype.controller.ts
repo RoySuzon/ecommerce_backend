@@ -4,6 +4,7 @@ import specificationtypeService from "./specificationtype.service";
 
 class SpecificationtypeController {
     async add(req: Request, res: Response) {
+        //  #swagger.tags = ['Specificationtype']
         try {
             const { name, specifications } = req.body as {
                 name: string;
@@ -34,13 +35,14 @@ class SpecificationtypeController {
     }
 
     async addMany(req: Request, res: Response) {
+        //  #swagger.tags = ['Specificationtype']
+        const { data } = req.body;
         try {
+            const prismaArgs: Prisma.SpecificationsTypeCreateInput[] = (data as [string]).map((e) => ({
+                name: e
+            }));
 
-            const data: Prisma.SpecificationsTypeCreateManyAndReturnArgs = {
-                data: req.body
-            }
-
-            const result = await specificationtypeService.insertMany(data);
+            const result = await specificationtypeService.insertMany(prismaArgs);
             return res.success({ data: result, });
         } catch (error: any) {
             return res.error({ message: error.message, errors: error });
@@ -48,6 +50,7 @@ class SpecificationtypeController {
     }
 
     async update(req: Request, res: Response) {
+        //  #swagger.tags = ['Specificationtype']
         try {
             const result = await specificationtypeService.update();
             return res.success({ data: result, });
@@ -57,6 +60,7 @@ class SpecificationtypeController {
     }
 
     async delete(req: Request, res: Response) {
+        //  #swagger.tags = ['Specificationtype']
         try {
             const result = await specificationtypeService.delete();
             return res.success({ data: result, });
@@ -66,6 +70,7 @@ class SpecificationtypeController {
     }
 
     async get(req: Request, res: Response) {
+        //  #swagger.tags = ['Specificationtype']
         const { } = req.query;
         try {
 
