@@ -1,4 +1,5 @@
 import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger-output.json';
@@ -11,6 +12,7 @@ import productRoute from "./features/product/product.route";
 import specificationtypeRoute from "./features/specificationtype/specificationtype.route";
 import productVariantRoute from "./features/variant/productVariant.route";
 import { responseMiddleware } from "./middlewares/apiResponse";
+dotenv.config(); // <-- loads .env variables into process.env
 
 // require("../swagger");;
 

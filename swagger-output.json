@@ -13,9 +13,6 @@
   "paths": {
     "/auth/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
         "description": "",
         "parameters": [
           {
@@ -40,18 +37,12 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
     },
     "/auth/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
         "description": "",
         "parameters": [
           {
@@ -85,9 +76,6 @@
     },
     "/auth/logout": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
         "description": "",
         "parameters": [
           {
@@ -110,29 +98,6 @@
       }
     },
     "/auth/me": {
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/auth/profile": {
       "get": {
         "description": "",
         "parameters": [
