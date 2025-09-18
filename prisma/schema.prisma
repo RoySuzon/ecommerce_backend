@@ -14,6 +14,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int     @id @default(autoincrement())
+  userId    String  @unique
+  firstName String?
+  lastName  String?
+  email     String  @unique
+  password  String
+
+  @@index([id, email, userId])
+  @@map("users")
+}
+
 /// ✅ Brand Table
 model Brand {
   id       Int       @id @default(autoincrement())
@@ -141,4 +153,11 @@ model ProductVariantSpecification {
   specificationId Int
   variant         ProductVariant    @relation(fields: [variantId], references: [id])
   specification   AllSpecifications @relation(fields: [specificationId], references: [id])
+}
+
+model TokenBlacklist {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

@@ -11,7 +11,6 @@ class CommonController {
 
             let take: any | null = !isNaN(Number(limit)) ? Number(limit) : undefined;
 
-
             // switch (type) {
             //     case TypeName.BRAND:
 

@@ -3,6 +3,7 @@ import express from "express";
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger-output.json';
 import allspecificationsRoute from "./features/allspecifications/allspecifications.route";
+import authRoute from "./features/auth/auth.route";
 import brandRoute from "./features/brand/brand.route";
 import categoryRoute from "./features/category/category.route";
 import commonRoute from "./features/common/common.route";
@@ -19,6 +20,8 @@ app.use(cors())
 app.use(express.json());
 app.use(responseMiddleware)
 
+app.use('/auth', authRoute)
+// app.use('/user', userRoute)
 app.use('/product', productRoute)
 app.use('/category', categoryRoute)
 app.use('/brand', brandRoute)
